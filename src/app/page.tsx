@@ -1,4 +1,5 @@
 import Results from "@/components/Results";
+import error from "./error";
 
 const API_KEY = process.env.API_KEY;
 
@@ -18,36 +19,26 @@ export default async function Page({ searchParams }: PageProps) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
 
-  try {
-    // Make the fetch request with the AbortController's signal
-    const res = await fetch(url, { signal: controller.signal });
+  // Make the fetch request with the AbortController's signal
+  const res = await fetch(url, { signal: controller.signal });
 
-    if (!res.ok) {
-      // Throw an error if the response is not ok
-      throw new Error(`Failed to fetch data: ${res.statusText}`);
-    }
-
-    // Parse the JSON data
-    const data = await res.json();
-    const results = data.results;
-    // console.log(results);
-
-    // Clear the timeout if the fetch request completes successfully
-    clearTimeout(timeoutId);
-
-    return (
-      <div className="min-h-screen">
-        <Results results={results} />
-        {/* Render results if needed */}
-      </div>
-    );
-  } catch (error) {
-    console.error("Error fetching data:", error);
-
-    return (
-      <div className="min-h-screen">
-        <h1>Error fetching data</h1>
-      </div>
-    );
+  if (!res.ok) {
+    // Throw an error if the response is not ok
+    throw new Error(`Failed to fetch data: ${res.statusText}`);
   }
+
+  // Parse the JSON data
+  const data = await res.json();
+  const results = data.results;
+  // console.log(results);
+
+  // Clear the timeout if the fetch request completes successfully
+  clearTimeout(timeoutId);
+
+  return (
+    <div className="min-h-screen">
+      <Results results={results} />
+      {/* Render results if needed */}
+    </div>
+  );
 }
