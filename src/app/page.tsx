@@ -1,5 +1,4 @@
 import Results from "@/components/Results";
-import error from "./error";
 
 const API_KEY = process.env.API_KEY;
 
@@ -11,16 +10,18 @@ interface PageProps {
 
 export default async function Page({ searchParams }: PageProps) {
   const genre = searchParams.genre || "fetchTrending";
-  const url = `https://api.themoviedb.org/3${
-    genre === "fetchTopRated" ? `/movie/top_rated` : `/trending/all/week`
-  }?api_key=${API_KEY}&language=en-US&page=1`;
 
-  // Create an AbortController to handle request timeout
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
-
-  // Make the fetch request with the AbortController's signal
-  const res = await fetch(url, { signal: controller.signal });
+  const res = await new Promise((resolve) => {
+    setTimeout(async () => {
+      const response = await fetch(
+        `https://api.themoviedb.org/3${
+          genre === "fetchTopRated" ? `/movie/top_rated` : `/trending/all/week`
+        }?api_key=${API_KEY}&language=en-US&page=1`,
+        { next: { revalidate: 10000 } }
+      );
+      resolve(response);
+    }, 2000);
+  });
 
   if (!res.ok) {
     // Throw an error if the response is not ok
@@ -31,9 +32,6 @@ export default async function Page({ searchParams }: PageProps) {
   const data = await res.json();
   const results = data.results;
   // console.log(results);
-
-  // Clear the timeout if the fetch request completes successfully
-  clearTimeout(timeoutId);
 
   return (
     <div className="min-h-screen">
