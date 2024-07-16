@@ -5,12 +5,12 @@ import React from "react";
 import { useSearchParams } from "next/navigation";
 
 interface NavbarItemProps {
-  title: String;
-  param: String;
+  title: string;
+  param: string;
 }
 
 export default function NavbarItem({ title, param }: NavbarItemProps) {
-  const searchParam = useSearchParams();
+  const searchParam = new URLSearchParams(useSearchParams().toString());
   const genre = searchParam.get("genre");
   return (
     <div>
