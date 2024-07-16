@@ -11,7 +11,7 @@ interface PageProps {
 export default async function Page({ searchParams }: PageProps) {
   const genre = searchParams.genre || "fetchTrending";
 
-  const res = await new Promise((resolve) => {
+  const res: Response = await new Promise((resolve) => {
     setTimeout(async () => {
       const response = await fetch(
         `https://api.themoviedb.org/3${
